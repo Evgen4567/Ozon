@@ -12,6 +12,12 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
+headers_d = {
+    "accept": "application/json",
+    "Client-Id": "123090",
+    "Api-Key": "87e400a8-a791-4cc5-ad98-82c032c90d5b",
+    "Content-Type": "application/json"
+}
 
 # Dependency
 def get_db():
@@ -75,3 +81,9 @@ async def image(image: UploadFile = File(...)):
 @app.post("/uploadfile/")
 async def create_upload_file(file: UploadFile = File(...)):
     return {"filename": file.filename}
+
+
+@app.get("/orders", response_model=schemas.Orders)
+async def get_orders_from_ozon():
+    orders = crud.get_orders(headers_d)
+    return {"orders": orders}

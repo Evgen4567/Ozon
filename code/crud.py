@@ -1,6 +1,11 @@
+from datetime import datetime, timedelta
+
 from sqlalchemy.orm import Session
 
 from . import models, schemas
+from .ozon_methods import order
+
+
 
 
 def get_user(db: Session, user_id: int):
@@ -34,3 +39,17 @@ def create_user_item(db: Session, item: schemas.ItemCreate, user_id: int):
     db.commit()
     db.refresh(db_item)
     return db_item
+
+
+def get_orders(headers: dict, dir: str="desc", time_since: datetime=datetime.utcnow()-timedelta(1),
+               time_to: datetime=datetime.utcnow(), limit: int = 50, offset: int = 0):
+    return order.list_orders(headers, dir, time_since, time_to, limit, offset).json()['result']
+
+
+# def create_user(db: Session, orders: schemas.OrderCreate):
+#     fake_hashed_password = user.password + "notreallyhashed"
+#     db_user = models.User(email=user.email, hashed_password=fake_hashed_password)
+#     db.add(db_user)
+#     db.commit()
+#     db.refresh(db_user)
+#     return db_user
