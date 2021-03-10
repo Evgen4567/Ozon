@@ -1,3 +1,4 @@
 /venv/Lib/site-packages/
 /venv/Scripts/f2py.exe
 /venv/Scripts/uvicorn.exe
+/sql_app.db-journal

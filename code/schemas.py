@@ -47,6 +47,9 @@ class Orders(BaseModel):
     created_at: str
     in_process_at: str
 
+    class Config:
+        orm_mode = True
+
 
 class OrderCreate(Orders):
     pass
@@ -59,6 +62,9 @@ class OrderProducts(BaseModel):
     quantity: int
     offer_id: str
     price: float
+
+    class Config:
+        orm_mode = True
 
 
 class OrderProductsCreate(OrderProducts):
@@ -75,6 +81,9 @@ class OrderAnalytics(BaseModel):
     warehouse_id: int
     warehouse_name: str
 
+    class Config:
+        orm_mode = True
+
 
 class OrderAnalyticsCreate(OrderAnalytics):
     pass
@@ -90,10 +99,13 @@ class OrderFinData(BaseModel):
     price: float
     total_discount_value: float
     total_discount_percent: float
-    #actions: List[Optional[str]] = None
+    # actions: List[Optional[str]] = None
     picking: Optional[str] = None
     quantity: int
     client_price: str
+
+    class Config:
+        orm_mode = True
 
 
 class OrderFinDataCreate(OrderFinData):

@@ -85,6 +85,11 @@ async def create_upload_file(file: UploadFile = File(...)):
     return {"filename": file.filename}
 
 
-@app.get("/orders")  # response_model=List[schemas.Orders])
-async def get_orders_from_ozon(db: Session = Depends(get_db)):
-    return crud.orders_from_ozon_to_db(db=db, headers=headers_d, time_since=datetime.utcnow() - timedelta(3))
+@app.get("/ozon/fbo/orders")  # response_model=List[schemas.Orders])
+async def get_orders_from_ozon(db: Session = Depends(get_db), days_ago: int = 1):
+    return crud.orders_from_ozon_to_db(db=db, headers=headers_d, time_since=datetime.utcnow() - timedelta(days_ago))
+
+
+@app.post("/ozon/fbo/orders/unique")
+async def check_unique_order(posting_number: Optional[str], db: Session = Depends(get_db)):
+    return crud.check_unique_order(db=db, posting_number=posting_number)
