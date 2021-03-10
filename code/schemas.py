@@ -44,8 +44,8 @@ class Orders(BaseModel):
     order_number: str
     status: str
     cancel_reason_id: int
-    created_at: datetime
-    in_process_at: datetime
+    created_at: str
+    in_process_at: str
 
 
 class OrderCreate(Orders):
@@ -90,10 +90,10 @@ class OrderFinData(BaseModel):
     price: float
     total_discount_value: float
     total_discount_percent: float
-    # actions: Optional[list] = None
+    #actions: List[Optional[str]] = None
     picking: Optional[str] = None
     quantity: int
-    client_price: float
+    client_price: str
 
 
 class OrderFinDataCreate(OrderFinData):

@@ -1,4 +1,5 @@
 import shutil
+from datetime import datetime, timedelta
 from typing import List, Optional
 
 from fastapi.responses import FileResponse
@@ -18,6 +19,7 @@ headers_d = {
     "Api-Key": "87e400a8-a791-4cc5-ad98-82c032c90d5b",
     "Content-Type": "application/json"
 }
+
 
 # Dependency
 def get_db():
@@ -83,7 +85,6 @@ async def create_upload_file(file: UploadFile = File(...)):
     return {"filename": file.filename}
 
 
-@app.get("/orders") # response_model=List[schemas.Orders])
-async def get_orders_from_ozon():
-    orders = crud.get_orders(headers_d)
-    return orders
+@app.get("/orders")  # response_model=List[schemas.Orders])
+async def get_orders_from_ozon(db: Session = Depends(get_db)):
+    return crud.orders_from_ozon_to_db(db=db, headers=headers_d, time_since=datetime.utcnow() - timedelta(3))

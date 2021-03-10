@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Float
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Float, DateTime
 from sqlalchemy.orm import relationship
 
 from .database import Base
@@ -35,6 +35,8 @@ class Order(Base):
     order_number = Column(String, index=True)
     status = Column(String, index=True)
     cancel_reason_id = Column(Integer, index=True)
+    created_at = Column(String, index=True)
+    in_process_at = Column(String, index=True)
 
     order_products = relationship("OrderProducts", back_populates="own_products")
     order_analytics = relationship("OrderAnalytics", back_populates="own_analytics")
@@ -84,9 +86,9 @@ class OrderFinData(Base):
     price = Column(Float, index=True)
     total_discount_value = Column(Float, index=True)
     total_discount_percent = Column(Float, index=True)
-    # actions: Optional[list] = None
+    #actions = Column(String, index=True)
     picking = Column(String, index=True)
     quantity = Column(Integer, index=True)
-    client_price = Column(Float, index=True)
+    client_price = Column(String, index=True)
 
     own_findata = relationship("Order", back_populates="order_findata")
