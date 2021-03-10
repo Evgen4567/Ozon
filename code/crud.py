@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from typing import List
 
 from sqlalchemy.orm import Session
 
@@ -41,9 +42,25 @@ def create_user_item(db: Session, item: schemas.ItemCreate, user_id: int):
     return db_item
 
 
-def get_orders(headers: dict, dir: str="desc", time_since: datetime=datetime.utcnow()-timedelta(1),
-               time_to: datetime=datetime.utcnow(), limit: int = 50, offset: int = 0):
-    return order.list_orders(headers, dir, time_since, time_to, limit, offset).json()['result']
+def orders_from_ozon_to_db(db: Session, orderproducts: List[schemas.OrderProductsCreate],
+        headers: dict, dir: str="desc", time_since: datetime = datetime.utcnow()-timedelta(5),
+        time_to: datetime=datetime.utcnow(), limit: int = 50, offset: int = 0):
+    list_orders = order.list_orders(headers, dir, time_since, time_to, limit, offset).json()['result']
+    for elem in list_orders:
+        elem_product = elem['products'][0]
+        db_product = models.OrderProducts(
+            posting_number=elem['posting_number'],
+            sku=elem_product['sku'],
+            name=elem_product['name'],
+            quantity=elem_product['quantity'],
+            offer_id=elem_product['offer_id'],
+            price=elem_product['price'],
+        )
+        db.add(db_product)
+        db.commit()
+        db.refresh(db_product)
+
+    return "db_product complete!"
 
 
 # def create_user(db: Session, orders: schemas.OrderCreate):

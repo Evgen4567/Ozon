@@ -83,7 +83,7 @@ async def create_upload_file(file: UploadFile = File(...)):
     return {"filename": file.filename}
 
 
-@app.get("/orders", response_model=schemas.Orders)
+@app.get("/orders") # response_model=List[schemas.Orders])
 async def get_orders_from_ozon():
     orders = crud.get_orders(headers_d)
-    return {"orders": orders}
+    return orders
