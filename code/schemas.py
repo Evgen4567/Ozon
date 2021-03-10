@@ -90,7 +90,7 @@ class OrderFinData(BaseModel):
     price: float
     total_discount_value: float
     total_discount_percent: float
-    actions: Optional[list] = None
+    # actions: Optional[list] = None
     picking: Optional[str] = None
     quantity: int
     client_price: float
