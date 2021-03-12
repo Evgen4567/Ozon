@@ -26,8 +26,8 @@ class Item(Base):
     owner = relationship("User", back_populates="items")
 
 
-class Order(Base):
-    __tablename__ = "order"
+class Orders(Base):
+    __tablename__ = "orders"
 
     id = Column(Integer, primary_key=True, index=True)
     posting_number = Column(String, index=True)
@@ -47,21 +47,21 @@ class OrderProducts(Base):
     __tablename__ = "order_products"
 
     id = Column(Integer, primary_key=True, index=True)
-    posting_number = Column(String, ForeignKey("order.posting_number"))
+    posting_number = Column(String, ForeignKey("orders.posting_number"))
     sku = Column(Integer, index=True)
     name = Column(String, index=True)
     quantity = Column(Integer, index=True)
     offer_id = Column(String, index=True)
     price = Column(Float, index=True)
 
-    own_products = relationship("Order", back_populates="order_products")
+    own_products = relationship("Orders", back_populates="order_products")
 
 
 class OrderAnalytics(Base):
     __tablename__ = "order_analytics"
 
     id = Column(Integer, primary_key=True, index=True)
-    posting_number = Column(String, ForeignKey("order.posting_number"))
+    posting_number = Column(String, ForeignKey("orders.posting_number"))
     region = Column(String, index=True)
     city = Column(String, index=True)
     delivery_type = Column(String, index=True)
@@ -70,14 +70,14 @@ class OrderAnalytics(Base):
     warehouse_id = Column(Integer, index=True)
     warehouse_name = Column(String, index=True)
 
-    own_analytics = relationship("Order", back_populates="order_analytics")
+    own_analytics = relationship("Orders", back_populates="order_analytics")
 
 
 class OrderFinData(Base):
     __tablename__ = "order_findata"
 
     id = Column(Integer, primary_key=True, index=True)
-    posting_number = Column(String, ForeignKey("order.posting_number"))
+    posting_number = Column(String, ForeignKey("orders.posting_number"))
     commission_amount = Column(Integer, index=True)
     commission_percent = Column(Integer, index=True)
     payout = Column(Integer, index=True)
@@ -91,4 +91,4 @@ class OrderFinData(Base):
     quantity = Column(Integer, index=True)
     client_price = Column(String, index=True)
 
-    own_findata = relationship("Order", back_populates="order_findata")
+    own_findata = relationship("Orders", back_populates="order_findata")

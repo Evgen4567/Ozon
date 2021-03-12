@@ -46,7 +46,7 @@ def orders_from_ozon_to_db(db: Session, headers: dict, dir: str = "desc",
     list_orders = order.list_orders(headers, dir, time_since, time_to, limit, offset).json()['result']
     for elem in list_orders:
         if check_unique_order(db, elem['posting_number']) == 0:
-            db_orders = models.Order(
+            db_orders = models.Orders(
                 posting_number=elem['posting_number'], order_id=elem['order_id'], order_number=elem['order_number'],
                 status=elem['status'], cancel_reason_id=elem['cancel_reason_id'], created_at=elem['created_at'],
                 in_process_at=elem['in_process_at']
@@ -97,7 +97,7 @@ def orders_from_ozon_to_db(db: Session, headers: dict, dir: str = "desc",
 
 
 def check_unique_order(db: Session, posting_number: Optional[str]):
-    return db.query(models.Order).filter(models.Order.posting_number == posting_number).count()
+    return db.query(models.Orders).filter(models.Orders.posting_number == posting_number).count()
 
 
 def check_unique_order_product(db: Session, posting_number: Optional[str]):
