@@ -1,9 +1,11 @@
 from datetime import datetime, timedelta
-from typing import List, Optional
+from typing import List, Optional, Type, TypeVar, Union, Dict, Any
 
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
 from . import models, schemas
+from .models import Orders
 from .ozon_methods import order
 
 
@@ -39,6 +41,7 @@ def create_user_item(db: Session, item: schemas.ItemCreate, user_id: int):
     db.refresh(db_item)
     return db_item
 
+
 # TODO(upsert)
 def orders_from_ozon_to_db(db: Session, headers: dict, dir: str = "desc",
                            time_since: datetime = datetime.utcnow() - timedelta(1),
@@ -54,6 +57,7 @@ def orders_from_ozon_to_db(db: Session, headers: dict, dir: str = "desc",
             db.add(db_orders)
             db.commit()
             db.refresh(db_orders)
+
 
         if check_unique_order_product(db, elem['posting_number']) == 0:
             elem_product = elem['products'][0]
@@ -111,10 +115,26 @@ def check_unique_order_analytics(db: Session, posting_number: Optional[str]):
 def check_unique_order_findata(db: Session, posting_number: Optional[str]):
     return db.query(models.OrderFinData).filter(models.OrderFinData.posting_number == posting_number).count()
 
-# def create_user(db: Session, orders: schemas.OrderCreate):
-#     fake_hashed_password = user.password + "notreallyhashed"
-#     db_user = models.User(email=user.email, hashed_password=fake_hashed_password)
-#     db.add(db_user)
-#     db.commit()
-#     db.refresh(db_user)
-#     return db_user
+
+def get(db: Session, posting_number: Any) -> Optional[models.Orders]:
+    return db.query(Orders).filter(Orders.posting_number == posting_number).first()
+
+
+def update(
+        db: Session,
+        *,
+        db_obj: models.Orders,
+        obj_in: Union[models.Orders, Dict[str, Any]]
+) -> models.Orders:
+    obj_data = jsonable_encoder(db_obj)
+    if isinstance(obj_in, dict):
+        update_data = obj_in
+    else:
+        update_data = obj_in.dict(exclude_unset=True)
+    for field in obj_data:
+        if field in update_data:
+            setattr(db_obj, field, update_data[field])
+    db.add(db_obj)
+    db.commit()
+    db.refresh(db_obj)
+    return db_obj

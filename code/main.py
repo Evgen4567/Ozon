@@ -126,11 +126,11 @@ def update_order(
     order_in: schemas.Orders
     ) -> Any:
     """Update a user."""
-    order = crud.user.get(db, id=user_id)
-    if not user:
-        raise HTTPException(
-            status_code=404,
-            detail="The user with this username does not exist in the system",
-        )
-    user = crud.user.update(db, db_obj=user, obj_in=user_in)
-    return user
+    order = crud.get(db=db, posting_number=post_num)
+    # if not order:
+    #     raise HTTPException(
+    #         status_code=404,
+    #         detail="The order with this posting_number does not exist in the system",
+    #     )
+    order = crud.update(db, db_obj=order, obj_in=order_in)
+    return order
