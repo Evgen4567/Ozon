@@ -127,10 +127,10 @@ def update_order(
     ) -> Any:
     """Update a user."""
     order = crud.get(db=db, posting_number=post_num)
-    # if not order:
-    #     raise HTTPException(
-    #         status_code=404,
-    #         detail="The order with this posting_number does not exist in the system",
-    #     )
+    if not order:
+        raise HTTPException(
+            status_code=404,
+            detail="The order with this posting_number does not exist in the system",
+        )
     order = crud.update(db, db_obj=order, obj_in=order_in)
     return order
