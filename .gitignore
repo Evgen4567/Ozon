@@ -2,3 +2,7 @@
 /venv/Scripts/f2py.exe
 /venv/Scripts/uvicorn.exe
 /sql_app.db-journal
+/venv/Scripts/mjml.exe
+/venv/Scripts/mjml-html-compare
+/venv/Scripts/py.test.exe
+/venv/Scripts/pytest.exe
