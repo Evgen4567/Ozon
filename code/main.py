@@ -1,15 +1,15 @@
 import shutil
 from datetime import datetime, timedelta
-from typing import List, Optional, Any
+from typing import List, Any
 
-from fastapi.encoders import jsonable_encoder
 from fastapi.responses import FileResponse
 from fastapi import Depends, FastAPI, HTTPException, File, UploadFile
 from sqlalchemy.orm import Session
 
-from . import crud, models, schemas
+from code.backend.app import crud
+from .backend.app import models, schemas
 from .database import SessionLocal, engine
-from .models import Orders
+from code.backend.app.models import Orders
 
 models.Base.metadata.create_all(bind=engine)
 

@@ -34,6 +34,7 @@ class OrderInDBBase(OrderBase):
     cancel_reason_id: int
     created_at: str
     in_process_at: str
+    owner_id: int
 
     class Config:
         orm_mode = True

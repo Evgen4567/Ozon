@@ -1,6 +1,5 @@
-from _ozon_methods import product, fbo_orders
-import pandas as pd
-from datetime import datetime, timedelta
+from code.backend._ozon_methods import fbo_orders
+from datetime import datetime
 
 headers_d = {
         "accept": "application/json",
