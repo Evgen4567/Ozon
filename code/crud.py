@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from . import models, schemas
 from .models import Orders
-from .ozon_methods import order
+from .ozon_methods import fbo_orders
 
 
 def get_user(db: Session, user_id: int):
@@ -46,17 +46,22 @@ def create_user_item(db: Session, item: schemas.ItemCreate, user_id: int):
 def orders_from_ozon_to_db(db: Session, headers: dict, dir: str = "desc",
                            time_since: datetime = datetime.utcnow() - timedelta(1),
                            time_to: datetime = datetime.utcnow(), limit: int = 50, offset: int = 0):
-    list_orders = order.list_orders(headers, dir, time_since, time_to, limit, offset).json()['result']
+    list_orders = fbo_orders.list_orders(headers, dir, time_since, time_to, limit, offset).json()['result']
     for elem in list_orders:
-        if check_unique_order(db, elem['posting_number']) == 0:
-            db_orders = models.Orders(
-                posting_number=elem['posting_number'], order_id=elem['order_id'], order_number=elem['order_number'],
-                status=elem['status'], cancel_reason_id=elem['cancel_reason_id'], created_at=elem['created_at'],
-                in_process_at=elem['in_process_at']
-            )
+        db_orders = models.Orders(
+            posting_number=elem['posting_number'], order_id=elem['order_id'], order_number=elem['order_number'],
+            status=elem['status'], cancel_reason_id=elem['cancel_reason_id'], created_at=elem['created_at'],
+            in_process_at=elem['in_process_at']
+        )
+
+        dict_to_upd = db_orders.__dict__
+        order = get(db=db, posting_number=elem['posting_number'])
+        if not order:
             db.add(db_orders)
             db.commit()
             db.refresh(db_orders)
+        else:
+            update(db, db_obj=order, obj_in=dict_to_upd)
 
 
         if check_unique_order_product(db, elem['posting_number']) == 0:

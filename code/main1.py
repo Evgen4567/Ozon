@@ -1,4 +1,4 @@
-from ozon_methods import product, order
+from ozon_methods import product, fbo_orders
 import pandas as pd
 from datetime import datetime, timedelta
 
@@ -14,7 +14,7 @@ if __name__ == "__main__":
     # res = str(product.get_product_info_by_product_id(headers_d, 53503011)['sku'])
     time_since = datetime(2021, 3, 6, microsecond=1)
     time_to = datetime(2021, 3, 10, microsecond=1)
-    res = order.list_orders(headers_d, time_since=time_since, time_to=time_to).json()['result']
+    res = fbo_orders.list_orders(headers_d, time_since=time_since, time_to=time_to).json()['result']
     print(res[0])
 
 
