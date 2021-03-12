@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from . import models, schemas
 from .models import Orders
-from .ozon_methods import fbo_orders
+from ._ozon_methods import fbo_orders
 
 
 def get_user(db: Session, user_id: int):

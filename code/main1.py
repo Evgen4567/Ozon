@@ -1,4 +1,4 @@
-from ozon_methods import product, fbo_orders
+from _ozon_methods import product, fbo_orders
 import pandas as pd
 from datetime import datetime, timedelta
 
