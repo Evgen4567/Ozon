@@ -27,14 +27,13 @@ class OrderUpdate(OrderBase):
 # Properties shared by models stored in DB
 class OrderInDBBase(OrderBase):
     id: int
-    posting_number: str
-    order_id: str
-    order_number: str
-    status: str
-    cancel_reason_id: int
-    created_at: str
-    in_process_at: str
-    owner_id: int
+    posting_number: Optional[str] = None
+    order_id: Optional[str] = None
+    order_number: Optional[str] = None
+    status: Optional[str] = None
+    cancel_reason_id: Optional[int] = None
+    created_at: Optional[str] = None
+    in_process_at: Optional[str] = None
 
     class Config:
         orm_mode = True
