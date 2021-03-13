@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from typing import Any, List
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
 from code.backend.app import crud, models, schemas
@@ -116,17 +117,20 @@ def upsert_order(
     """
     list_orders = fbo_orders.list_orders(headers=Settings.HEADERS, time_since=datetime.utcnow() - timedelta(days)) \
         .json()['result']
-    print("list_orders")
+    result = {'created': [], 'updated': []}
     for elem in list_orders:
-        order_in = OrderCreate(
+        order_in = schemas.OrderCreate(
             posting_number=elem['posting_number'], order_id=elem['order_id'], order_number=elem['order_number'],
             status=elem['status'], cancel_reason_id=elem['cancel_reason_id'], created_at=elem['created_at'],
             in_process_at=elem['in_process_at']
         )
         id_for_upd = crud.order.get_id_by_posting_number(db=db, posting_number=elem['posting_number'])
         if not id_for_upd:
-            create_order(db=db, obj_in=order_in)
+            create_order(db=db, order_in=order_in)
+            result['created'].append(elem['posting_number'])
         else:
-            update_order(db=db, id=id_for_upd, obj_in=order_in)
+            id_for_upd = id_for_upd[0][0]
+            update_order(db=db, id=id_for_upd, order_in=order_in)
+            result['updated'].append(elem['posting_number'])
+    return result
 
-    return 'end upsert'

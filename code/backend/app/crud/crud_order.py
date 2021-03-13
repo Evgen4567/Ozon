@@ -1,4 +1,4 @@
-from typing import List, Any
+from typing import List, Any, Optional
 # from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
@@ -16,12 +16,9 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         )
 
     def get_id_by_posting_number(
-            self, db: Session, *, posting_number: str,
-    ) -> Any:
-        print("get_id_by_posting_number started")
-        return (
-            db.query(self.model.id).filter(Order.posting_number == posting_number).all()
-        )
+            self, db: Session, posting_number: str,
+    ) -> Optional[int]:
+        return db.query(self.model.id).filter(Order.posting_number == posting_number).all()
 
 
 order = CRUDOrder(Order)
