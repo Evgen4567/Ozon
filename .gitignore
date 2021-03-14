@@ -6,5 +6,5 @@
 /venv/Scripts/mjml-html-compare
 /venv/Scripts/py.test.exe
 /venv/Scripts/pytest.exe
-/code/personal_data.py
 /sql_app.db
+/personal_data.py

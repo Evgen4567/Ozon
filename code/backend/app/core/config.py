@@ -1,5 +1,6 @@
 from personal_data import PersonalData
 
+
 class Settings:
     API_V1_STR: str = "/api/v1"
     HEADERS: dict = {
