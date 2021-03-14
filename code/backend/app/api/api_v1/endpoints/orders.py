@@ -115,7 +115,7 @@ def upsert_order(
     """
     Upsert orders from Ozon.
     """
-    list_orders = fbo_orders.list_orders(headers=Settings.HEADERS, time_since=datetime.utcnow() - timedelta(days)) \
+    list_orders = fbo_orders.list_orders(time_since=datetime.utcnow() - timedelta(days)) \
         .json()['result']
     result = {'created': [], 'updated': []}
     for elem in list_orders:
@@ -124,13 +124,51 @@ def upsert_order(
             status=elem['status'], cancel_reason_id=elem['cancel_reason_id'], created_at=elem['created_at'],
             in_process_at=elem['in_process_at']
         )
-        id_for_upd = crud.order.get_id_by_posting_number(db=db, posting_number=elem['posting_number'])
-        if not id_for_upd:
+        order_upd = schemas.OrderUpdate(
+            posting_number=elem['posting_number'], order_id=elem['order_id'], order_number=elem['order_number'],
+            status=elem['status'], cancel_reason_id=elem['cancel_reason_id'], created_at=elem['created_at'],
+            in_process_at=elem['in_process_at']
+        )
+        order_in_db = crud.order.get_id_by_posting_number(db=db, posting_number=elem['posting_number'])
+        if not order_in_db:
             create_order(db=db, order_in=order_in)
             result['created'].append(elem['posting_number'])
         else:
-            id_for_upd = id_for_upd[0][0]
-            update_order(db=db, id=id_for_upd, order_in=order_in)
+            id_for_upd = order_in_db[0][0]
+            update_order(db=db, id=id_for_upd, order_in=order_upd)
             result['updated'].append(elem['posting_number'])
     return result
 
+
+@router.post("/update/internal_orders/")  # , response_model=schemas.Order)
+def upd_internal_orders(
+        *,
+        db: Session = Depends(deps.get_db),
+        status: str = 'cancelled'
+        # current_user: models.User = Depends(deps.get_current_active_user), -- для авторизации
+) -> Any:
+    """
+    Update orders in DB by status.
+    """
+    orders = crud.order.get_all_by_status(db=db, status=status)
+    for order in orders:
+        id_upd = order.id
+        post_num = order.posting_number
+        order_in = fbo_orders.get_order(post_num).json()['result']
+        # order
+        # update_order(db=db, id=order.id, order_in=order_in)
+    return order_in
+
+
+@router.get("/test/")  # , response_model=schemas.Order)
+def test_req_func(
+        *,
+        db: Session = Depends(deps.get_db),
+        posting_number: str = '34857201-0007-1'
+        # current_user: models.User = Depends(deps.get_current_active_user), -- для авторизации
+) -> Any:
+    """
+    Update orders in DB by status.
+    """
+    res = crud.order.get_by_posting_number(db=db, posting_number=posting_number)
+    return res
