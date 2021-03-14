@@ -27,7 +27,7 @@ def list_orders(dir="asc",
             "financial_data": True
         }
     }
-    return requests.post(url, headers=headers, json=body_d)
+    return requests.post(url, headers=headers, json=body_d).json()['result']
 
 
 def get_order(posting_number: str, analytics_data: bool = True, financial_data: bool = True):
@@ -40,4 +40,4 @@ def get_order(posting_number: str, analytics_data: bool = True, financial_data: 
             "financial_data": financial_data
         }
     }
-    return requests.post(url, headers=headers, json=body_d)
+    return requests.post(url, headers=headers, json=body_d).json()['result']

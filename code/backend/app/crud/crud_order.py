@@ -16,9 +16,9 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         )
 
     def get_all_by_status(
-            self, db: Session, status: str,
+            self, db: Session, status: List[str],
     ) -> List[Order]:
-        return db.query(self.model).filter(Order.status == status).all()
+        return db.query(self.model).filter(Order.status.in_(status)).all()
 
     def get_id_by_posting_number(
             self, db: Session, posting_number: str,

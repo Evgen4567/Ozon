@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from code.backend.app import crud, models, schemas
 from code.backend.app.api import deps
+from code.backend.app.api.api_v1.endpoints import utils
 from code.backend.app.core.config import Settings
 from code.backend.app.ozon_methods import fbo_orders
 from code.backend.app.schemas import OrderCreate
@@ -106,7 +107,7 @@ def delete_order(
 
 
 @router.get("/upsert/")  # , response_model=List[str]
-def upsert_order(
+async def upsert_order(
         *,
         db: Session = Depends(deps.get_db),
         days: int = 1,
@@ -115,60 +116,57 @@ def upsert_order(
     """
     Upsert orders from Ozon.
     """
-    list_orders = fbo_orders.list_orders(time_since=datetime.utcnow() - timedelta(days)) \
-        .json()['result']
+    list_orders = fbo_orders.list_orders(time_since=datetime.utcnow() - timedelta(days))
     result = {'created': [], 'updated': []}
     for elem in list_orders:
-        order_in = schemas.OrderCreate(
-            posting_number=elem['posting_number'], order_id=elem['order_id'], order_number=elem['order_number'],
-            status=elem['status'], cancel_reason_id=elem['cancel_reason_id'], created_at=elem['created_at'],
-            in_process_at=elem['in_process_at']
-        )
-        order_upd = schemas.OrderUpdate(
-            posting_number=elem['posting_number'], order_id=elem['order_id'], order_number=elem['order_number'],
-            status=elem['status'], cancel_reason_id=elem['cancel_reason_id'], created_at=elem['created_at'],
-            in_process_at=elem['in_process_at']
-        )
-        order_in_db = crud.order.get_id_by_posting_number(db=db, posting_number=elem['posting_number'])
+        order_ins = utils.parse_order_to_insert(elem)
+        order_upd = utils.parse_order_to_update(elem)
+        order_in_db = crud.order.get_all_by_posting_number(db=db, posting_number=elem['posting_number'])
         if not order_in_db:
-            create_order(db=db, order_in=order_in)
+            create_order(db=db, order_in=order_ins)
             result['created'].append(elem['posting_number'])
         else:
-            id_for_upd = order_in_db[0][0]
+            id_for_upd = order_in_db[0].id
             update_order(db=db, id=id_for_upd, order_in=order_upd)
             result['updated'].append(elem['posting_number'])
     return result
 
 
-@router.post("/update/internal_orders/")  # , response_model=schemas.Order)
-def upd_internal_orders(
+@router.post("/update/by_status/")  # , response_model=schemas.Order)
+async def upd_orders_by_status(
         *,
         db: Session = Depends(deps.get_db),
-        status: str = 'cancelled'
+        status=None
         # current_user: models.User = Depends(deps.get_current_active_user), -- для авторизации
 ) -> Any:
     """
     Update orders in DB by status.
     """
+    if status is None:
+        status = ["awaiting_approve", "awaiting_packaging", "awaiting_deliver", "delivering", "driver_pickup"]
+    order_in, count_upd = 0, 0
     orders = crud.order.get_all_by_status(db=db, status=status)
     for order in orders:
-        id_upd = order.id
         post_num = order.posting_number
-        order_in = fbo_orders.get_order(post_num).json()['result']
-        # order
-        # update_order(db=db, id=order.id, order_in=order_in)
-    return order_in
+        order_from_ozon = fbo_orders.get_order(post_num)
+        order_in = utils.parse_order_to_update(order_from_ozon)
+        update_order(db=db, id=order.id, order_in=order_in)
+        count_upd += 1
+    return count_upd
 
 
-@router.get("/test/")  # , response_model=schemas.Order)
+@router.post("/test/")  # , response_model=schemas.Order)
 def test_req_func(
         *,
         db: Session = Depends(deps.get_db),
-        posting_number: str = '34857201-0007-1'
+        posting_number: str = '34857201-0007-1',
+        status: List[str] = None
         # current_user: models.User = Depends(deps.get_current_active_user), -- для авторизации
 ) -> Any:
     """
-    Update orders in DB by status.
-    """
-    res = crud.order.get_by_posting_number(db=db, posting_number=posting_number)
-    return res
+#     Test functions and methods
+#     """
+    if status is None:
+        status = ["awaiting_approve", "awaiting_packaging", "awaiting_deliver", "delivering", "driver_pickup"]
+    orders = crud.order.get_all_by_status(db=db, status=status)
+    return orders
