@@ -7,3 +7,4 @@
 /venv/Scripts/py.test.exe
 /venv/Scripts/pytest.exe
 /code/personal_data.py
+/sql_app.db
