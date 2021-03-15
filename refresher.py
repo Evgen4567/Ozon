@@ -8,9 +8,9 @@ from playsound import playsound
 def refresher_bot(url_links: List[str]):
     while True:
         res_upsert = requests.get(url_links[0]).json()
-        requests.post(url_links[1])
         if not res_upsert['created']:
             playsound("money.mp3")
+        requests.post(url_links[1])
         print("Refresh_done. go to sleep")
         time.sleep(180)
 
