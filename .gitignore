@@ -8,3 +8,4 @@
 /venv/Scripts/pytest.exe
 /sql_app.db
 /personal_data.py
+/refresher.py

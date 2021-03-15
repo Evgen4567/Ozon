@@ -1,3 +1,4 @@
+import requests
 from fastapi import FastAPI
 # from starlette.middleware.cors import CORSMiddleware
 
@@ -16,4 +17,5 @@ app.include_router(api_router, prefix=Settings.API_V1_STR)
 
 # Добавить обновление по таймеру каждые 5 минут - upsert за последние сутки
 # Обновление всех товаров 1 раз в неделю.
-# Добавить обновление по статусу заказа not in (cancelled, delivired)
+# Добавить остальные таблицы с заказом
+
