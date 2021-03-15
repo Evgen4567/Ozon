@@ -4,6 +4,7 @@ from typing import Any, List
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
+from starlette.responses import StreamingResponse, FileResponse
 
 from code.backend.app import crud, models, schemas
 from code.backend.app.api import deps
@@ -124,7 +125,8 @@ async def upsert_order(
         order_in_db = crud.order.get_all_by_posting_number(db=db, posting_number=elem['posting_number'])
         if not order_in_db:
             create_order(db=db, order_in=order_ins)
-            result['created'].append(elem['posting_number'])
+            result = sound_of_success()
+            # result['created'].append(elem['posting_number'])
         else:
             id_for_upd = order_in_db[0].id
             update_order(db=db, id=id_for_upd, order_in=order_upd)
@@ -155,18 +157,6 @@ async def upd_orders_by_status(
     return count_upd
 
 
-@router.post("/test/")  # , response_model=schemas.Order)
-def test_req_func(
-        *,
-        db: Session = Depends(deps.get_db),
-        posting_number: str = '34857201-0007-1',
-        status: List[str] = None
-        # current_user: models.User = Depends(deps.get_current_active_user), -- для авторизации
-) -> Any:
-    """
-#     Test functions and methods
-#     """
-    if status is None:
-        status = ["awaiting_approve", "awaiting_packaging", "awaiting_deliver", "delivering", "driver_pickup"]
-    orders = crud.order.get_all_by_status(db=db, status=status)
-    return orders
+@router.get("/test/")  # , response_model=schemas.Order)
+def sound_of_success():
+    return FileResponse("money.mp3")

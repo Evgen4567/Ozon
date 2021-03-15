@@ -1,3 +1,5 @@
+from starlette.responses import FileResponse
+
 from code.backend.app import schemas
 
 
@@ -14,3 +16,7 @@ def parse_order_to_update(elem):
         status=elem['status'], cancel_reason_id=elem['cancel_reason_id'], created_at=elem['created_at'],
         in_process_at=elem['in_process_at']
     )
+
+
+def sound_of_success():
+    return FileResponse("money.mp3")
