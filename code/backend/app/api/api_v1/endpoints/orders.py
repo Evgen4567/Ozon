@@ -125,7 +125,6 @@ async def upsert_order(
         order_in_db = crud.order.get_all_by_posting_number(db=db, posting_number=elem['posting_number'])
         if not order_in_db:
             create_order(db=db, order_in=order_ins)
-            # result = sound_of_success()
             result['created'].append(elem['posting_number'])
         else:
             id_for_upd = order_in_db[0].id
