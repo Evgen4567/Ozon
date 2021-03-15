@@ -19,7 +19,7 @@ router = APIRouter()
 def read_orders(
         db: Session = Depends(deps.get_db),
         skip: int = 0,
-        limit: int = 100,
+        limit: int = 50,
         # current_user: models.User = Depends(deps.get_current_active_user), -- для авторизации
 ) -> Any:
     """
