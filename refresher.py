@@ -2,20 +2,25 @@ from typing import List
 
 import requests
 import time
-from playsound import playsound
+from personal_data import PersonalData
 
 
 def refresher_bot(url_links: List[str]):
+    count = 0
     while True:
+        count += 1
         res_upsert = requests.get(url_links[0]).json()
-        if not res_upsert['created']:
-            playsound("money.mp3")
-        requests.post(url_links[1])
-        print("Refresh_done. go to sleep")
-        time.sleep(180)
+        if res_upsert['created']:
+            PersonalData.play_audio()
+        if count == 6:
+            count = 0
+            requests.post(url_links[1])
+            print("Refresh status of orders done. Go to sleep")
+        print("Refresh orders done. Go to sleep")
+        time.sleep(PersonalData.SLEEP)
 
 
 if __name__ == '__main__':
-    url = ["http://192.168.0.101/api/v1/orders/upsert/?days=3", "http://192.168.0.101/api/v1/orders/update/by_status/"]
+    url = [PersonalData.HOST + "/api/v1/orders/upsert/?days=1",
+           PersonalData.HOST + "/api/v1/orders/update/by_status/"]
     refresher_bot(url)
-
