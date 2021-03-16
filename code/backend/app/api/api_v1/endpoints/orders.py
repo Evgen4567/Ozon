@@ -2,17 +2,14 @@ from datetime import datetime, timedelta
 from typing import Any, List
 
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
-from starlette.responses import StreamingResponse, FileResponse
+from starlette.responses import FileResponse
 
-from code.backend.app import crud, models, schemas
+from code.backend.app import crud, schemas
 from code.backend.app.api import deps
 from code.backend.app.api.api_v1.endpoints import utils
-from code.backend.app.core.config import Settings
 from code.backend.app.ozon_methods import fbo_orders
-from code.backend.app.schemas import OrderCreate
-from playsound import playsound
+
 router = APIRouter()
 
 
