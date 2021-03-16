@@ -148,7 +148,7 @@ async def upd_findata_by_status_order(
     orders = crud.order.get_all_by_status(db=db, status=status)
     for order in orders:
         post_num = order.posting_number
-        findata_id = crud.findata.get_id_by_posting_number(db=db, posting_number=post_num)
+        findata_id = crud.findata.get_id_by_posting_number(db=db, posting_number=post_num)[0].id
         findata_from_ozon = fbo_orders.get_order(post_num)
         findata_in = utils.parse_findata_to_update(findata_from_ozon)
         update_findata(db=db, id=findata_id, findata_in=findata_in)
