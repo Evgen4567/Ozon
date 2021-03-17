@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 
 # Shared properties
-class OrderBase(BaseModel):
+class SalesBase(BaseModel):
     posting_number: Optional[str] = None
     order_id: Optional[str] = None
     order_number: Optional[str] = None
@@ -38,17 +38,17 @@ class OrderBase(BaseModel):
 
 
 # Properties to receive on item creation
-class OrderCreate(OrderBase):
+class SalesCreate(SalesBase):
     pass
 
 
 # Properties to receive on item update
-class OrderUpdate(OrderBase):
+class SalesUpdate(SalesBase):
     pass
 
 
 # Properties shared by models stored in DB
-class OrderInDBBase(OrderBase):
+class SalesInDBBase(SalesBase):
     id: int
     posting_number: Optional[str] = None
     order_id: Optional[str] = None
@@ -86,10 +86,10 @@ class OrderInDBBase(OrderBase):
 
 
 # Properties to return to client
-class Order(OrderInDBBase):
+class Sales(SalesInDBBase):
     pass
 
 
 # Properties properties stored in DB
-class OrderInDB(OrderInDBBase):
+class SalesInDB(SalesInDBBase):
     pass

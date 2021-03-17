@@ -26,8 +26,6 @@ def refresher_bot(url_links: List[str]):
 
 if __name__ == '__main__':
     url = [PersonalData.HOST + "/api/v1/orders/upsert/?days=1",
-           PersonalData.HOST + "/api/v1/orders/update/by_status/",
-           PersonalData.HOST + "/api/v1/findata/upsert/?days=1",
-           PersonalData.HOST + "/api/v1/findata/update/by_status/"]
+           PersonalData.HOST + "/api/v1/orders/update/by_status/"]
     refresher_bot(url)
     # os.system('deadbeef money.py')

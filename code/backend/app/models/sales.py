@@ -9,7 +9,7 @@ from code.backend.app.db.database import Base
 #     from .user import User  # noqa: F401 -- unknown
 
 
-class Order(Base):
+class Sales(Base):
     __tablename__ = "order"
 
     id = Column(Integer, primary_key=True, index=True)

@@ -3,8 +3,8 @@ from starlette.responses import FileResponse
 from code.backend.app import schemas
 
 
-def parse_order_to_insert(elem):
-    return schemas.OrderCreate(
+def parse_sales_to_insert(elem):
+    return schemas.SalesCreate(
         posting_number=elem['posting_number'],
         order_id=elem['order_id'],
         order_number=elem['order_number'],
@@ -38,8 +38,8 @@ def parse_order_to_insert(elem):
     )
 
 
-def parse_order_to_update(elem):
-    return schemas.OrderUpdate(
+def parse_sales_to_update(elem):
+    return schemas.SalesUpdate(
         posting_number=elem['posting_number'],
         order_id=elem['order_id'],
         order_number=elem['order_number'],

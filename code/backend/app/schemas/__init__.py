@@ -1,1 +1,1 @@
-from .order import Order, OrderCreate, OrderInDB, OrderUpdate
+from .sales import Sales, SalesCreate, SalesInDB, SalesUpdate

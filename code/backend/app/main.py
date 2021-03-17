@@ -8,7 +8,7 @@ from code.backend.app import models
 from code.backend.app.db.database import SessionLocal, engine
 from code.backend.app.core.config import Settings
 
-models.order.Base.metadata.create_all(bind=engine)
+models.sales.Base.metadata.create_all(bind=engine)
 app = FastAPI()
 app.include_router(api_router, prefix=Settings.API_V1_STR)
 
