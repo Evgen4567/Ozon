@@ -10,7 +10,7 @@ from code.backend.app.db.database import Base
 
 
 class Sales(Base):
-    __tablename__ = "order"
+    __tablename__ = "sales"
 
     id = Column(Integer, primary_key=True, index=True)
     posting_number = Column(String, index=True)
