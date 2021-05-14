@@ -108,13 +108,15 @@ def delete_sales(
 async def upsert_sales(
         *,
         db: Session = Depends(deps.get_db),
-        days: int = 1,
+        days_from: int = 1,
+        days_to: int = 0
         # current_user: models.User = Depends(deps.get_current_active_user), -- для авторизации
 ) -> Any:
     """
     Upsert orders from Ozon.
     """
-    list_sales = fbo_orders.list_orders(time_since=datetime.utcnow() - timedelta(days))
+    list_sales = fbo_orders.list_orders(time_since=datetime.utcnow() - timedelta(days_from),
+                                        time_to=datetime.utcnow() - timedelta(days_to))
     result = {'created': [], 'updated': []}
     for elem in list_sales:
         sales_ins = utils.parse_sales_to_insert(elem)

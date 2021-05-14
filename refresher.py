@@ -13,7 +13,7 @@ def refresher_bot(url_links: List[str]):
         res_upsert = requests.get(url_links[0]).json()
         requests.get(url_links[2]).json()
         if res_upsert['created']:
-            os.system('deadbeef money.py')
+            # os.system('deadbeef money.py')
             print("New order!")
         if count == PersonalData.COUNT_REQ:
             count = 0
