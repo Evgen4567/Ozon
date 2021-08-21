@@ -12,8 +12,12 @@ models.sales.Base.metadata.create_all(bind=engine)
 app = FastAPI()
 app.include_router(api_router, prefix=Settings.API_V1_STR)
 
+@app.on_event("startup")
+async def startup_event():
+    print('server is started')
+
+# need to open ports 192.168.0.100 sudo nano /etc/hosts
 # uvicorn code.backend.app.main:app --host 192.168.0.100 --port 80 --reload
-# uvicorn code.backend.app.main:app --host 192.168.0.101 --port 80 --reload
 
 
 # Добавить остальные таблицы с заказом

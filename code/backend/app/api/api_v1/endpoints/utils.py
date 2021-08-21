@@ -73,5 +73,25 @@ def parse_sales_to_update(elem):
     )
 
 
+def parse_raw_data_to_insert(elem):
+    return schemas.RawDataCreate(
+        posting_number=elem['posting_number'],
+        order_id=elem['order_id'],
+        order_number=elem['order_number'],
+        status=elem['status'],
+        json_data=str(elem),
+    )
+
+
+def parse_raw_data_to_update(elem):
+    return schemas.RawDataUpdate(
+        posting_number=elem['posting_number'],
+        order_id=elem['order_id'],
+        order_number=elem['order_number'],
+        status=elem['status'],
+        json_data=str(elem),
+    )
+
+
 def sound_of_success():
     return FileResponse("money.mp3")
