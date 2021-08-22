@@ -127,6 +127,7 @@ async def upsert_sales(
             result['created'].append(elem['posting_number'])
         else:
             id_for_upd = raw_data_in_db[0].id
+            print(id_for_upd, raw_data_upd)
             update_sales(db=db, id=id_for_upd, raw_data_in=raw_data_upd)
             result['updated'].append(elem['posting_number'])
     return result
