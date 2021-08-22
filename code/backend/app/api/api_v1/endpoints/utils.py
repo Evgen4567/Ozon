@@ -78,7 +78,7 @@ def parse_raw_data_to_insert(elem):
         posting_number=elem['posting_number'],
         order_id=elem['order_id'],
         status=elem['status'],
-        json_data_2=elem,
+        json_data=elem,
     )
 
 
@@ -87,7 +87,7 @@ def parse_raw_data_to_update(elem):
         posting_number=elem['posting_number'],
         order_id=elem['order_id'],
         status=elem['status'],
-        json_data_2=elem,
+        json_data=elem,
     )
 
 

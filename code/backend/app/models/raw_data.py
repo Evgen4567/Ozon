@@ -17,4 +17,4 @@ class RawData(Base):
     posting_number = Column(String, index=True)
     order_id = Column(String, index=True)
     status = Column(String, index=True)
-    json_data_2 = Column(JSON)
+    json_data = Column(JSON)

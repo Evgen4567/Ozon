@@ -8,7 +8,7 @@ class RawDataBase(BaseModel):
     posting_number: Optional[str] = None
     order_id: Optional[str] = None
     status: Optional[str] = None
-    json_data_2: Dict[AnyStr, Any] = None  # Union[List[Any], Dict[AnyStr, Any]] = None
+    json_data: Dict[AnyStr, Any] = None  # Union[List[Any], Dict[AnyStr, Any]] = None
 
 
 # Properties to receive on item creation
@@ -27,7 +27,7 @@ class RawDataInDBase(RawDataBase):
     posting_number: Optional[str] = None
     order_id: Optional[str] = None
     status: Optional[str] = None
-    json_data_2: Dict[AnyStr, Any] = None  # Union[List[Any], Dict[AnyStr, Any]] = None
+    json_data: Dict[AnyStr, Any] = None  # Union[List[Any], Dict[AnyStr, Any]] = None
 
     class Config:
         orm_mode = True
