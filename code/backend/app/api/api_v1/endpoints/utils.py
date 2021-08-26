@@ -93,3 +93,29 @@ def parse_raw_data_to_update(elem):
 
 def sound_of_success():
     return FileResponse("money.mp3")
+
+
+def parse_order_to_insert(elem):
+    return schemas.OrderCreate(
+        order_id=elem['order_id'],
+        order_number=elem['order_number'],
+        posting_number=elem['posting_number'],
+        status=elem['status'],
+        cancel_reason_id=elem['cancel_reason_id'],
+        created_at=elem['created_at'],
+        in_process_at=elem['in_process_at'],
+        order_sum=sum([float(p['price']) for p in elem['products']]),
+    )
+
+
+def parse_order_to_update(elem):
+    return schemas.OrderUpdate(
+        order_id=elem['order_id'],
+        order_number=elem['order_number'],
+        posting_number=elem['posting_number'],
+        status=elem['status'],
+        cancel_reason_id=elem['cancel_reason_id'],
+        created_at=elem['created_at'],
+        in_process_at=elem['in_process_at'],
+        order_sum=sum([float(p['price']) for p in elem['products']]),
+    )

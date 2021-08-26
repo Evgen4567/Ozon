@@ -1,0 +1,156 @@
+from datetime import datetime, timedelta
+from typing import Any, List
+
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+from starlette.responses import FileResponse
+
+from code.backend.app import crud, schemas
+from code.backend.app.api import deps
+from code.backend.app.api.api_v1.endpoints import utils
+from code.backend.app.ozon_methods import fbo_orders
+
+router = APIRouter()
+
+
+@router.get("/", response_model=List[schemas.Order])
+def read_order(
+        db: Session = Depends(deps.get_db),
+        skip: int = 0,
+        limit: int = 100,
+        # current_user: models.User = Depends(deps.get_current_active_user), -- для авторизации
+) -> Any:
+    """
+    Retrieve order.
+    """
+    order = crud.order.get_multi(db, skip=skip, limit=limit)
+    # if crud.user.is_superuser(current_user):
+    #     items = crud.order.get_multi(db, skip=skip, limit=limit)
+    # else:
+    #     items = crud.order.get_multi_by_owner(
+    #         db=db, owner_id=current_user.id, skip=skip, limit=limit
+    #     )
+    return order
+
+
+@router.post("/", response_model=schemas.Order)
+def create_order(
+        *,
+        db: Session = Depends(deps.get_db),
+        order_in: schemas.OrderCreate,
+        # current_user: models.User = Depends(deps.get_current_active_user), -- для авторизации
+) -> Any:
+    """
+    Create new order.
+    """
+    order = crud.order.create(db=db, obj_in=order_in)
+    return order
+
+
+@router.put("/{id}", response_model=schemas.Order)
+def update_order(
+        *,
+        db: Session = Depends(deps.get_db),
+        id: int,
+        order_in: schemas.OrderUpdate,
+        # current_user: models.User = Depends(deps.get_current_active_user), -- для авторизации
+) -> Any:
+    """
+    Update an order.
+    """
+    order = crud.order.get(db=db, id=id)
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    # if not crud.user.is_superuser(current_user) and (order.owner_id != current_user.id):  -- для авторизации
+    #     raise HTTPException(status_code=400, detail="Not enough permissions")
+    order = crud.order.update(db=db, db_obj=order, obj_in=order_in)
+    return order
+
+
+@router.get("/{id}", response_model=schemas.Order)
+def read_order_by_id(
+        *,
+        db: Session = Depends(deps.get_db),
+        id: int,
+        # current_user: models.User = Depends(deps.get_current_active_user), -- для авторизации
+) -> Any:
+    """
+    Get order by ID.
+    """
+    order = crud.order.get(db=db, id=id)
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    # if not crud.user.is_superuser(current_user) and (order.owner_id != current_user.id): -- для авторизации
+    #     raise HTTPException(status_code=400, detail="Not enough permissions")
+    return order
+
+
+@router.delete("/{id}", response_model=schemas.Order)
+def delete_order(
+        *,
+        db: Session = Depends(deps.get_db),
+        id: int,
+        # current_user: models.User = Depends(deps.get_current_active_user), -- для авторизации
+) -> Any:
+    """
+    Delete an order.
+    """
+    order = crud.order.get(db=db, id=id)
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    # if not crud.user.is_superuser(current_user) and (order.owner_id != current_user.id):
+    #     raise HTTPException(status_code=400, detail="Not enough permissions")
+    order = crud.order.remove(db=db, id=id)
+    return order
+
+
+@router.get("/upsert/")  # , response_model=List[str]
+async def upsert_order(
+        *,
+        db: Session = Depends(deps.get_db),
+        days_from: int = 1,
+        days_to: int = 0
+        # current_user: models.User = Depends(deps.get_current_active_user), -- для авторизации
+) -> Any:
+    """
+    Upsert orders from Ozon.
+    """
+    list_order = fbo_orders.list_orders(time_since=datetime.utcnow() - timedelta(days_from),
+                                        time_to=datetime.utcnow() - timedelta(days_to))
+    result = {'created': [], 'updated': []}
+    for elem in list_order:
+        order_ins = utils.parse_order_to_insert(elem)
+        order_upd = utils.parse_order_to_update(elem)
+        order_in_db = crud.order.get_all_by_posting_number(db=db, posting_number=elem['posting_number'])
+        if not order_in_db:
+            create_order(db=db, order_in=order_ins)
+            result['created'].append(elem['posting_number'])
+        else:
+            id_for_upd = order_in_db[0].id
+            update_order(db=db, id=id_for_upd, order_in=order_upd)
+            result['updated'].append(elem['posting_number'])
+    return result
+
+
+@router.post("/update/by_status/")  # , response_model=schemas.Order)
+async def upd_order_by_status(
+        *,
+        db: Session = Depends(deps.get_db),
+        status=None
+        # current_user: models.User = Depends(deps.get_current_active_user), -- для авторизации
+) -> Any:
+    """
+    Update order in DB by status.
+    """
+    if status is None:
+        status = ["awaiting_approve", "awaiting_packaging", "awaiting_deliver", "delivering", "driver_pickup"]
+    order_in, count_upd = 0, 0
+    order = crud.order.get_all_by_status(db=db, status=status)
+    for sale in order:
+        post_num = sale.posting_number
+        order_from_ozon = fbo_orders.get_order(post_num)
+        order_in = utils.parse_order_to_update(order_from_ozon)
+        update_order(db=db, id=sale.id, order_in=order_in)
+        count_upd += 1
+    return count_upd
+
